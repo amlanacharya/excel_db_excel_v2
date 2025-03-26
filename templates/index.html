@@ -1,544 +1,973 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Excel NL Query System</title>
+    <title>Excel Natural Language Query</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #1abc9c;
-            --warning: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --primary: #2c68f6;
+            --primary-light: #e6eeff;
+            --primary-dark: #1e45a1;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --white: #ffffff;
+            --body-bg: #f7f9fc;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.2s ease-in-out;
+            --radius: 8px;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-code: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
         }
-        
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font-main);
             line-height: 1.6;
-            color: #333;
-            background-color: #f5f7fa;
+            background-color: var(--body-bg);
+            color: var(--dark);
             padding: 0;
             margin: 0;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
         }
-        
-        header {
-            background-color: var(--primary);
-            color: white;
-            padding: 1rem;
-            box-shadow: var(--box-shadow);
+
+        .header {
+            background-color: var(--white);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.75rem;
+            color: var(--primary);
+        }
+
         .header-content {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            max-width: 1200px;
-            margin: 0 auto;
         }
-        
-        .header-title {
-            display: flex;
-            align-items: center;
-        }
-        
-        .header-title i {
-            font-size: 1.5rem;
-            margin-right: 12px;
-        }
-        
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-        
-        .system-status {
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 8px 12px;
-            border-radius: 50px;
-        }
-        
+
         .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        
-        .active {
-            background-color: #2ecc71;
-        }
-        
-        .inactive {
-            background-color: #e74c3c;
-        }
-        
-        main {
-            padding: 2rem 0;
-        }
-        
-        .card {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-        
-        .card-header {
-            padding: 1rem;
-            border-bottom: 1px solid #eee;
-            font-weight: 600;
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--secondary);
+            padding: 6px 12px;
+            border-radius: 16px;
             background-color: var(--light);
         }
-        
-        .card-body {
-            padding: 1.5rem;
-        }
-        
-        .query-box {
-            display: flex;
-            margin-bottom: 1rem;
-        }
-        
-        .query-input {
-            flex: 1;
-            padding: 12px 15px;
-            font-size: 1rem;
-            border: 2px solid #ddd;
-            border-radius: var(--border-radius) 0 0 var(--border-radius);
-            transition: border-color 0.3s;
-        }
-        
-        .query-input:focus {
-            outline: none;
-            border-color: var(--secondary);
-        }
-        
-        .submit-btn {
-            padding: 12px 20px;
-            background-color: var(--secondary);
-            color: white;
-            font-weight: 600;
-            border: none;
-            border-radius: 0 var(--border-radius) var(--border-radius) 0;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .submit-btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .submit-btn i {
+
+        .status-icon {
             margin-right: 8px;
+            font-size: 10px;
         }
-        
-        .sql-query {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #f5f5f5;
-            padding: 15px;
-            border-radius: var(--border-radius);
-            margin: 1rem 0;
-            overflow-x: auto;
-            display: none;
-            position: relative;
-            border-left: 4px solid var(--secondary);
+
+        .status-active {
+            color: var(--success);
         }
-        
-        .sql-query pre {
-            margin: 0;
-            white-space: pre-wrap;
+
+        .status-fallback {
+            color: var(--warning);
         }
-        
-        .sql-header {
+
+        .main-content {
+            padding: 24px 0;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .tabs {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            color: #666;
-            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: var(--white);
         }
-        
-        .copy-btn {
-            background: none;
-            border: none;
-            color: var(--secondary);
+
+        .tab {
+            padding: 16px 24px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+            border-bottom: 2px solid transparent;
         }
-        
-        .copy-btn:hover {
+
+        .tab:hover {
+            background-color: var(--primary-light);
             color: var(--primary);
         }
-        
-        .loading {
+
+        .tab.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .tab-content {
             display: none;
-            text-align: center;
-            padding: 1rem;
+            padding: 24px;
         }
-        
-        .spinner {
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 48px 12px 16px;
+            font-size: 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: var(--radius);
+            background-color: var(--white);
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 104, 246, 0.15);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .examples-container {
+            background-color: var(--primary-light);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .examples-title {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+        }
+
+        .examples-title i {
+            margin-right: 8px;
+        }
+
+        .example-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .example-chip {
             display: inline-block;
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top-color: var(--secondary);
-            animation: spin 1s ease-in-out infinite;
+            padding: 8px 16px;
+            background-color: var(--white);
+            border-radius: 20px;
+            color: var(--primary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid rgba(44, 104, 246, 0.3);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
-        
+
+        .example-chip:hover {
+            background-color: var(--primary);
+            color: var(--white);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sql-textarea {
+            width: 100%;
+            height: 180px;
+            padding: 12px;
+            font-family: var(--font-code);
+            font-size: 14px;
+            line-height: 1.4;
+            border: 2px solid #e1e5e9;
+            border-radius: var(--radius);
+            background-color: var(--white);
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        .sql-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 104, 246, 0.15);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            font-weight: 500;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+        }
+
+        .sql-display {
+            font-family: var(--font-code);
+            background-color: #f5f7f9;
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-top: 16px;
+            white-space: pre-wrap;
+            display: none;
+            position: relative;
+            border-left: 3px solid var(--primary);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: var(--white);
+            border: 1px solid #e1e5e9;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            color: var(--secondary);
+        }
+
+        .copy-btn i {
+            margin-right: 4px;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--light);
+            color: var(--primary);
+        }
+
+        .results-container {
+            margin-top: 24px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .results-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .results-title i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        .results-count {
+            font-size: 0.875rem;
+            color: var(--secondary);
+            background-color: var(--light);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid #e1e5e9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #f5f7f9;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid #e1e5e9;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9fafc;
+        }
+
+        tr:hover {
+            background-color: var(--primary-light);
+        }
+
+        .loading-spinner {
+            display: none;
+            margin: 24px auto;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(44, 104, 246, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
         @keyframes spin {
             to {
                 transform: rotate(360deg);
             }
         }
-        
-        .error {
+
+        .loading-text {
+            margin-top: 12px;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .error-container {
             display: none;
-            background-color: #fee;
-            color: var(--warning);
-            padding: 1rem;
-            border-radius: var(--border-radius);
-            margin: 1rem 0;
-            border-left: 4px solid var(--warning);
+            background-color: #fff2f2;
+            border-left: 4px solid var(--danger);
+            padding: 16px;
+            margin-top: 16px;
+            border-radius: var(--radius);
         }
-        
-        .results {
-            overflow-x: auto;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
-        }
-        
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        th {
-            background-color: var(--light);
-            font-weight: 600;
-            color: var(--dark);
-            position: sticky;
-            top: 0;
-        }
-        
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-        
-        .example-queries {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 15px;
-            margin-top: 1rem;
-        }
-        
-        .example-query {
-            padding: 15px;
-            background-color: white;
-            border-radius: var(--border-radius);
-            border-left: 4px solid var(--accent);
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .example-query:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-        
-        .example-query h4 {
-            font-size: 1rem;
-            color: var(--primary);
+
+        .error-title {
+            color: var(--danger);
+            display: flex;
+            align-items: center;
             margin-bottom: 8px;
+            font-weight: 500;
         }
-        
-        .example-query p {
-            font-size: 0.9rem;
-            color: #666;
-            margin: 0;
+
+        .error-title i {
+            margin-right: 8px;
         }
-        
-        .instructions {
-            line-height: 1.8;
+
+        .error-message {
+            color: #7d2a2a;
         }
-        
-        .instructions p {
-            margin-bottom: 1rem;
+
+        /* Schema Explorer Styles */
+        .schema-container {
+            margin-top: 20px;
         }
-        
-        .instructions ul {
-            margin-left: 1.5rem;
-            margin-bottom: 1rem;
+
+        .table-item {
+            margin-bottom: 16px;
+            border: 1px solid #e1e5e9;
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: var(--transition);
         }
-        
-        .instructions code {
-            background-color: #f5f5f5;
-            padding: 3px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', Courier, monospace;
+
+        .table-item:hover {
+            box-shadow: var(--card-shadow);
         }
-        
-        .result-stats {
-            background-color: var(--light);
-            padding: 10px 15px;
-            border-radius: var(--border-radius);
-            font-size: 0.9rem;
-            color: var(--dark);
-            margin-top: 10px;
+
+        .table-header {
+            background-color: #f5f7f9;
+            padding: 12px 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .table-name {
             display: flex;
             align-items: center;
         }
-        
-        .result-stats i {
+
+        .table-name i {
             margin-right: 8px;
+            color: var(--primary);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .table-button {
+            background-color: var(--white);
+            border: 1px solid #e1e5e9;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
             color: var(--secondary);
+            transition: var(--transition);
         }
-        
-        .no-results {
-            text-align: center;
-            padding: 2rem;
-            color: #666;
+
+        .table-button:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
         }
-        
-        footer {
-            text-align: center;
-            margin-top: 2rem;
-            padding: 1rem;
-            color: #666;
-            font-size: 0.9rem;
-            border-top: 1px solid #eee;
+
+        .table-button i {
+            margin-right: 4px;
         }
-        
+
+        .table-content {
+            display: none;
+            padding: 16px;
+            background-color: var(--white);
+        }
+
+        .columns-container {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            color: var(--secondary);
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .column-list {
+            list-style-type: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 8px;
+        }
+
+        .column-item {
+            padding: 8px 12px;
+            border-radius: 4px;
+            background-color: #f9fafc;
+            font-family: var(--font-code);
+            font-size: 0.875rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .column-item:hover {
+            background-color: var(--primary-light);
+        }
+
+        .column-name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .column-type {
+            color: var(--secondary);
+            font-size: 0.75rem;
+        }
+
+        .primary-key {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .primary-key-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary);
+            border-radius: 50%;
+        }
+
+        .sample-data-container {
+            overflow-x: auto;
+        }
+
+        .sample-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .sample-data-table th {
+            background-color: #f5f7f9;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .sample-data-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .actions-container {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .example-queries {
+            .tab {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+
+            .search-input {
+                padding: 10px 42px 10px 12px;
+            }
+
+            .example-chips {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .column-list {
                 grid-template-columns: 1fr;
-            }
-            
-            .header-content {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .system-status {
-                margin-top: 10px;
-                align-self: flex-start;
-            }
-            
-            .query-box {
-                flex-direction: column;
-            }
-            
-            .query-input, .submit-btn {
-                width: 100%;
-                border-radius: var(--border-radius);
-            }
-            
-            .submit-btn {
-                margin-top: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <div class="header-title">
-                <i class="fas fa-database"></i>
-                <h1>Excel Natural Language Query System</h1>
-            </div>
-            <div class="system-status" id="system-status">
-                <div class="status-indicator" id="status-indicator"></div>
+    <header class="header">
+        <div class="container header-content">
+            <h1><i class="fas fa-database"></i> Excel Natural Language Query</h1>
+            <div id="system-status" class="status-indicator">
+                <span class="status-icon" id="status-icon"></span>
                 <span id="status-text">Checking system status...</span>
             </div>
         </div>
     </header>
-    
-    <main class="container">
+
+    <div class="container main-content">
         <div class="card">
-            <div class="card-header">
-                <i class="fas fa-search"></i> Ask a Question
-            </div>
-            <div class="card-body">
-                <div class="query-box">
-                    <input type="text" id="query-input" class="query-input" placeholder="Ask a question about your Excel data..." autofocus>
-                    <button id="submit-btn" class="submit-btn"><i class="fas fa-paper-plane"></i> Submit</button>
+            <div class="tabs">
+                <div class="tab active" onclick="openTab('natural-language')">
+                    <i class="fas fa-comments"></i> Natural Language
                 </div>
-                
-                <div class="sql-query" id="sql-display">
-                    <div class="sql-header">
-                        <span>Generated SQL Query</span>
-                        <button id="copy-sql" class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
-                    </div>
-                    <pre id="sql-code"></pre>
+                <div class="tab" onclick="openTab('sql-query')">
+                    <i class="fas fa-code"></i> Custom SQL
                 </div>
-                
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p>Processing your query...</p>
+                <div class="tab" onclick="openTab('schema-explorer')">
+                    <i class="fas fa-table"></i> Schema Explorer
                 </div>
-                
-                <div class="error" id="error"></div>
-                
-                <div id="results" class="results"></div>
             </div>
-        </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-lightbulb"></i> Example Questions
+
+            <div id="natural-language" class="tab-content active">
+                <div class="search-container">
+                    <input type="text" id="query-input" class="search-input" placeholder="Ask a question about your Excel data...">
+                    <button id="submit-btn" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+
+                <div class="examples-container">
+                    <div class="examples-title">
+                        <i class="fas fa-lightbulb"></i> Example Questions
+                    </div>
+                    <div class="example-chips">
+                        <div class="example-chip" onclick="setQuery('What was the average deposit amount last quarter?')">
+                            Average deposit amount last quarter
+                        </div>
+                        <div class="example-chip" onclick="setQuery('List the top 5 largest deposits')">
+                            Top 5 largest deposits
+                        </div>
+                        <div class="example-chip" onclick="setQuery('Show depositor names with total deposits over $5000')">
+                            Deposits over $5000
+                        </div>
+                        <div class="example-chip" onclick="setQuery('What is the total outstanding loan balance?')">
+                            Total outstanding loan balance
+                        </div>
+                        <div class="example-chip" onclick="setQuery('Compare deposit totals between January and February')">
+                            Compare Jan-Feb deposits
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <p>Click on any example to try it out:</p>
-                
-                <div class="example-queries">
-                    <div class="example-query" onclick="setQuery('Show total deposits by month')">
-                        <h4>Monthly Deposits</h4>
-                        <p>Show total deposits by month</p>
-                    </div>
-                    
-                    <div class="example-query" onclick="setQuery('What is the average loan amount?')">
-                        <h4>Average Loan</h4>
-                        <p>What is the average loan amount?</p>
-                    </div>
-                    
-                    <div class="example-query" onclick="setQuery('Find all deposits greater than $2000')">
-                        <h4>Large Deposits</h4>
-                        <p>Find all deposits greater than $2000</p>
-                    </div>
-                    
-                    <div class="example-query" onclick="setQuery('List all borrowers with loans above 5% interest')">
-                        <h4>High-Interest Loans</h4>
-                        <p>List all borrowers with loans above 5% interest</p>
-                    </div>
-                    
-                    <div class="example-query" onclick="setQuery('Count deposits by category')">
-                        <h4>Deposit Categories</h4>
-                        <p>Count deposits by category</p>
-                    </div>
-                    
-                    <div class="example-query" onclick="setQuery('Show the sum of loans in each month of 2023')">
-                        <h4>Monthly Loan Totals</h4>
-                        <p>Show the sum of loans in each month of 2023</p>
+
+            <div id="sql-query" class="tab-content">
+                <h2>Custom SQL Query</h2>
+                <p>Write your own SQL query to access the database directly:</p>
+                <textarea id="sql-textarea" class="sql-textarea" placeholder="SELECT * FROM Deposits_Data_Lite_Sheet1 LIMIT 10;"></textarea>
+                <div style="margin-top: 16px;">
+                    <button id="execute-sql-btn" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Execute SQL
+                    </button>
+                </div>
+            </div>
+
+            <div id="schema-explorer" class="tab-content">
+                <h2>Database Schema Explorer</h2>
+                <p>Explore tables and columns to help build your queries:</p>
+                <div id="schema-container" class="schema-container">
+                    <div class="loading-spinner" id="schema-loading">
+                        <div class="spinner"></div>
+                        <div class="loading-text">Loading schema information...</div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-info-circle"></i> About This System
-            </div>
-            <div class="card-body instructions">
-                <p>This Excel Natural Language Query System allows you to ask questions about your Excel data in plain English. The system uses:</p>
-                
-                <ul>
-                    <li><strong>Natural Language Processing</strong> to understand your questions</li>
-                    <li><strong>Retrieval-Augmented Generation (RAG)</strong> to find relevant context</li>
-                    <li><strong>SQL Generation</strong> to create database queries</li>
-                    <li><strong>Your Excel Data</strong> stored in SQLite for quick access</li>
-                </ul>
-                
-                <p>You can ask questions like:</p>
-                <ul>
-                    <li>"What was the total amount of loans in June?"</li>
-                    <li>"Show me deposits greater than $3000"</li>
-                    <li>"Calculate the average interest rate for loans by month"</li>
-                    <li>"Compare deposits and loans by category"</li>
-                </ul>
-                
-                <p>For best results:</p>
-                <ul>
-                    <li>Be specific about what data you're looking for</li>
-                    <li>Mention column names when possible</li>
-                    <li>Ask one question at a time</li>
-                </ul>
-            </div>
+
+        <div class="sql-display" id="sql-display">
+            <button class="copy-btn" onclick="copySQL()">
+                <i class="fas fa-copy"></i> Copy
+            </button>
+            <pre id="sql-code"></pre>
         </div>
-    </main>
-    
-    <footer>
-        <p>Excel Natural Language Query System | Powered by LangChain, ChromaDB, and Flask</p>
-    </footer>
+
+        <div class="loading-spinner" id="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Processing your query...</div>
+        </div>
+
+        <div class="error-container" id="error-container">
+            <div class="error-title">
+                <i class="fas fa-exclamation-circle"></i> Error
+            </div>
+            <div class="error-message" id="error-message"></div>
+        </div>
+
+        <div class="results-container" id="results-container">
+            <!-- Results will be displayed here -->
+        </div>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            checkSystemStatus();
+        // Tab functionality
+        function openTab(tabName) {
+            // Hide all tab contents
+            var tabContents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
             
-            document.getElementById('submit-btn').addEventListener('click', submitQuery);
-            document.getElementById('query-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    submitQuery();
+            // Remove active class from all tabs
+            var tabs = document.getElementsByClassName("tab");
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            
+            // Activate the selected tab
+            document.getElementById(tabName).classList.add("active");
+            
+            // Find the tab button and activate it
+            for (var i = 0; i < tabs.length; i++) {
+                if (tabs[i].textContent.toLowerCase().includes(tabName.replace('-', ' '))) {
+                    tabs[i].classList.add("active");
                 }
-            });
+            }
             
-            document.getElementById('copy-sql').addEventListener('click', function() {
-                const sqlCode = document.getElementById('sql-code').textContent;
-                navigator.clipboard.writeText(sqlCode)
-                    .then(() => {
-                        const copyBtn = document.getElementById('copy-sql');
-                        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                        setTimeout(() => {
-                            copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
-                        }, 2000);
-                    })
-                    .catch(err => {
-                        console.error('Failed to copy: ', err);
-                    });
+            // Load schema if schema explorer tab is selected
+            if (tabName === 'schema-explorer' && !document.getElementById('schema-container').innerHTML.includes('table-item')) {
+                loadSchema();
+            }
+        }
+        
+        // Check if we're using Groq or local processing
+        fetch('/api/system-status')
+            .then(response => response.json())
+            .then(data => {
+                const statusIcon = document.getElementById('status-icon');
+                const statusText = document.getElementById('status-text');
+                
+                if (data.usingGroq) {
+                    statusIcon.classList.add('status-active');
+                    statusIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                    statusText.innerHTML = "Using Groq API for improved accuracy";
+                } else {
+                    statusIcon.classList.add('status-fallback');
+                    statusIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                    statusText.innerHTML = "Using local processing (add Groq API key for better results)";
+                }
+            })
+            .catch(error => {
+                console.error('Error checking system status:', error);
+                document.getElementById('status-text').innerHTML = "Status check failed";
             });
-        });
 
-        function checkSystemStatus() {
-            fetch('/api/system-status')
+        document.getElementById('submit-btn').addEventListener('click', submitQuery);
+        document.getElementById('query-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitQuery();
+            }
+        });
+        
+        document.getElementById('execute-sql-btn').addEventListener('click', executeSQL);
+
+        function loadSchema() {
+            const schemaContainer = document.getElementById('schema-container');
+            const loadingElement = document.getElementById('schema-loading');
+            loadingElement.style.display = 'flex';
+            
+            fetch('/api/schema')
                 .then(response => response.json())
                 .then(data => {
-                    const statusIndicator = document.getElementById('status-indicator');
-                    const statusText = document.getElementById('status-text');
+                    loadingElement.style.display = 'none';
                     
-                    if (data.usingGroq) {
-                        statusIndicator.className = 'status-indicator active';
-                        statusText.textContent = 'Using Groq API for enhanced accuracy';
+                    if (data.success) {
+                        const schema = data.schema;
+                        let schemaHTML = '';
+                        
+                        for (const tableName in schema) {
+                            const tableInfo = schema[tableName];
+                            const columns = tableInfo.columns;
+                            const sampleData = tableInfo.sample_data;
+                            
+                            schemaHTML += `
+                                <div class="table-item">
+                                    <div class="table-header" onclick="toggleTableContent('${tableName}')">
+                                        <div class="table-name">
+                                            <i class="fas fa-table"></i>
+                                            <span>${tableName}</span>
+                                        </div>
+                                        <div class="table-actions">
+                                            <button class="table-button" onclick="event.stopPropagation(); copyTableName('${tableName}')">
+                                                <i class="fas fa-copy"></i> Copy
+                                            </button>
+                                            <button class="table-button" onclick="event.stopPropagation(); generateSelectSQL('${tableName}')">
+                                                <i class="fas fa-code"></i> Generate SQL
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="table-content" id="table-${tableName}">
+                                        <div class="columns-container">
+                                            <div class="section-title">Columns</div>
+                                            <ul class="column-list">`;
+                            
+                            columns.forEach(col => {
+                                const isPK = col.pk ? 'primary-key' : '';
+                                schemaHTML += `
+                                    <li class="column-item ${isPK}">
+                                        <div class="column-name">
+                                            ${col.pk ? '<span class="primary-key-indicator"></span>' : ''}
+                                            <span>${col.name}</span>
+                                            <span class="column-type">(${col.type})</span>
+                                        </div>
+                                        <button class="table-button" onclick="copyColumnName('${col.name}')">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </li>`;
+                            });
+                            
+                            schemaHTML += `</ul>
+                                        </div>
+                                        <div class="sample-data-container">
+                                            <div class="section-title">Sample Data</div>`;
+                            
+                            if (sampleData && sampleData.length > 0) {
+                                schemaHTML += '<div class="table-container"><table class="sample-data-table"><thead><tr>';
+                                
+                                // Create headers
+                                const firstRow = sampleData[0];
+                                for (const key in firstRow) {
+                                    schemaHTML += `<th>${key}</th>`;
+                                }
+                                schemaHTML += '</tr></thead><tbody>';
+                                
+                                // Add data rows
+                                sampleData.forEach(row => {
+                                    schemaHTML += '<tr>';
+                                    for (const key in firstRow) {
+                                        schemaHTML += `<td>${row[key] !== null ? row[key] : ''}</td>`;
+                                    }
+                                    schemaHTML += '</tr>';
+                                });
+                                
+                                schemaHTML += '</tbody></table></div>';
+                            } else {
+                                schemaHTML += '<p>No sample data available</p>';
+                            }
+                            
+                            schemaHTML += `</div>
+                                        <div class="actions-container">
+                                            <button class="btn btn-primary" onclick="generateSelectSQL('${tableName}')">
+                                                <i class="fas fa-code"></i> Generate SELECT
+                                            </button>
+                                            <button class="btn btn-outline" onclick="generateCountSQL('${tableName}')">
+                                                <i class="fas fa-calculator"></i> Generate COUNT
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>`;
+                        }
+                        
+                        schemaContainer.innerHTML = schemaHTML;
                     } else {
-                        statusIndicator.className = 'status-indicator inactive';
-                        statusText.textContent = 'Using local processing (limited accuracy)';
+                        schemaContainer.innerHTML = `
+                            <div class="error-container" style="display: block;">
+                                <div class="error-title">
+                                    <i class="fas fa-exclamation-circle"></i> Error Loading Schema
+                                </div>
+                                <div class="error-message">${data.error}</div>
+                            </div>`;
                     }
                 })
                 .catch(error => {
-                    console.error('Error checking system status:', error);
-                    const statusIndicator = document.getElementById('status-indicator');
-                    const statusText = document.getElementById('status-text');
-                    statusIndicator.className = 'status-indicator inactive';
-                    statusText.textContent = 'System status unknown';
+                    loadingElement.style.display = 'none';
+                    schemaContainer.innerHTML = `
+                        <div class="error-container" style="display: block;">
+                            <div class="error-title">
+                                <i class="fas fa-exclamation-circle"></i> Error
+                            </div>
+                            <div class="error-message">Failed to load schema: ${error.message}</div>
+                        </div>`;
                 });
+        }
+        
+        function toggleTableContent(tableName) {
+            const tableContent = document.getElementById(`table-${tableName}`);
+            if (tableContent.style.display === 'block') {
+                tableContent.style.display = 'none';
+            } else {
+                tableContent.style.display = 'block';
+            }
+        }
+        
+        function copyTableName(tableName) {
+            navigator.clipboard.writeText(tableName);
+            showToast(`Copied "${tableName}" to clipboard`);
+        }
+        
+        function copyColumnName(columnName) {
+            navigator.clipboard.writeText(columnName);
+            showToast(`Copied "${columnName}" to clipboard`);
+        }
+        
+        function copySQL() {
+            const sqlCode = document.getElementById('sql-code').textContent;
+            navigator.clipboard.writeText(sqlCode);
+            showToast('SQL query copied to clipboard');
+        }
+        
+        function showToast(message) {
+            // Create toast element if it doesn't exist
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.style.position = 'fixed';
+                toast.style.bottom = '24px';
+                toast.style.right = '24px';
+                toast.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                toast.style.color = 'white';
+                toast.style.padding = '12px 24px';
+                toast.style.borderRadius = '4px';
+                toast.style.zIndex = '1000';
+                toast.style.transition = 'opacity 0.3s ease-in-out';
+                document.body.appendChild(toast);
+            }
+            
+            // Set message and show toast
+            toast.textContent = message;
+            toast.style.opacity = '1';
+            
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 3000);
+        }
+        
+        function generateSelectSQL(tableName) {
+            const sql = `SELECT * FROM ${tableName} LIMIT 10;`;
+            document.getElementById('sql-textarea').value = sql;
+            openTab('sql-query');
+        }
+        
+        function generateCountSQL(tableName) {
+            const sql = `SELECT COUNT(*) AS total_records FROM ${tableName};`;
+            document.getElementById('sql-textarea').value = sql;
+            openTab('sql-query');
         }
 
         function setQuery(query) {
@@ -551,9 +980,9 @@
             if (!query) return;
             
             // Show loading, hide results and error
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('results').innerHTML = '';
-            document.getElementById('error').style.display = 'none';
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('results-container').innerHTML = '';
+            document.getElementById('error-container').style.display = 'none';
             document.getElementById('sql-display').style.display = 'none';
             
             fetch('/query', {
@@ -568,100 +997,107 @@
                 document.getElementById('loading').style.display = 'none';
                 
                 if (data.success) {
+                    renderResults(data.data, data.columns, data.rowCount);
+                    
                     // Display SQL query if available
                     if (data.sql) {
                         document.getElementById('sql-code').textContent = data.sql;
                         document.getElementById('sql-display').style.display = 'block';
                     }
-                    
-                    renderResults(data);
                 } else {
-                    document.getElementById('error').textContent = data.error || 'An error occurred while processing your query.';
-                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error-message').textContent = data.error;
+                    document.getElementById('error-container').style.display = 'block';
                 }
             })
             .catch(error => {
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').textContent = 'An error occurred: ' + error.message;
-                document.getElementById('error').style.display = 'block';
+                document.getElementById('error-message').textContent = 'An error occurred: ' + error.message;
+                document.getElementById('error-container').style.display = 'block';
+            });
+        }
+        
+        function executeSQL() {
+            const sqlQuery = document.getElementById('sql-textarea').value.trim();
+            if (!sqlQuery) return;
+            
+            // Show loading, hide results and error
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('results-container').innerHTML = '';
+            document.getElementById('error-container').style.display = 'none';
+            document.getElementById('sql-display').style.display = 'none';
+            
+            fetch('/execute_sql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: sqlQuery }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                
+                if (data.success) {
+                    renderResults(data.data, data.columns, data.rowCount);
+                    
+                    // Display SQL query
+                    document.getElementById('sql-code').textContent = data.sql;
+                    document.getElementById('sql-display').style.display = 'block';
+                } else {
+                    document.getElementById('error-message').textContent = data.error;
+                    document.getElementById('error-container').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').textContent = 'An error occurred: ' + error.message;
+                document.getElementById('error-container').style.display = 'block';
             });
         }
 
-        function renderResults(data) {
-            const resultsContainer = document.getElementById('results');
+        function renderResults(data, columns, rowCount) {
+            const resultsContainer = document.getElementById('results-container');
             
-            if (!data.data || data.data.length === 0) {
-                resultsContainer.innerHTML = `
-                    <div class="no-results">
-                        <i class="fas fa-search" style="font-size: 2rem; color: #ddd; margin-bottom: 1rem;"></i>
-                        <p>No results found for your query.</p>
-                    </div>
-                `;
+            if (!data || data.length === 0) {
+                resultsContainer.innerHTML = '<p>No results found.</p>';
                 return;
             }
             
-            // Create table
-            let tableHTML = '<table><thead><tr>';
+            let resultsHTML = `
+                <div class="results-header">
+                    <div class="results-title">
+                        <i class="fas fa-table"></i> Query Results
+                    </div>
+                    <div class="results-count">${rowCount} ${rowCount === 1 ? 'row' : 'rows'}</div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>`;
             
             // Add headers
-            data.columns.forEach(column => {
-                tableHTML += `<th>${formatColumnName(column)}</th>`;
+            columns.forEach(column => {
+                resultsHTML += `<th>${column}</th>`;
             });
-            tableHTML += '</tr></thead><tbody>';
+            resultsHTML += `</tr>
+                        </thead>
+                        <tbody>`;
             
             // Add rows
-            data.data.forEach(row => {
-                tableHTML += '<tr>';
-                data.columns.forEach(column => {
-                    tableHTML += `<td>${formatCellValue(row[column])}</td>`;
+            data.forEach(row => {
+                resultsHTML += '<tr>';
+                columns.forEach(column => {
+                    const value = row[column] !== null ? row[column] : '';
+                    resultsHTML += `<td>${value}</td>`;
                 });
-                tableHTML += '</tr>';
+                resultsHTML += '</tr>';
             });
             
-            tableHTML += '</tbody></table>';
+            resultsHTML += `</tbody>
+                    </table>
+                </div>`;
             
-            // Add result stats
-            tableHTML += `
-                <div class="result-stats">
-                    <i class="fas fa-table"></i>
-                    <span>Found ${data.rowCount} ${data.rowCount === 1 ? 'result' : 'results'}</span>
-                </div>
-            `;
-            
-            resultsContainer.innerHTML = tableHTML;
-        }
-
-        function formatColumnName(column) {
-            // Convert snake_case to Title Case
-            return column
-                .split('_')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
-        }
-
-        function formatCellValue(value) {
-            if (value === null || value === undefined) {
-                return '';
-            }
-            
-            // Format numbers with commas
-            if (typeof value === 'number') {
-                // Check if it's a currency-like value
-                if (String(value).includes('.') && String(value).split('.')[1].length <= 2) {
-                    return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                }
-                return value.toLocaleString();
-            }
-            
-            // Format dates if it looks like a date
-            if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                const date = new Date(value);
-                if (!isNaN(date.getTime())) {
-                    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-                }
-            }
-            
-            return value;
+            resultsContainer.innerHTML = resultsHTML;
         }
     </script>
 </body>
