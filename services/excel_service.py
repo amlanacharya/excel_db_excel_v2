@@ -2,7 +2,8 @@ import os
 import logging
 from typing import Dict, Any, Optional, List, Set, Tuple
 from copy import copy
-
+# Add missing import at the top of the file
+from datetime import date  # Added this import for handling datetime conversions
 import openpyxl
 from openpyxl.workbook.workbook import Workbook as OpenpyxlWorkbook
 from openpyxl.worksheet.worksheet import Worksheet as OpenpyxlWorksheet

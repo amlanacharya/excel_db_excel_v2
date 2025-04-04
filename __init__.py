@@ -1,5 +1,3 @@
-# Root Package __init__.py 
-# excel_db_excel_v2/__init__.py
 """
 Excel Processing System
 A modular system for processing Excel workbooks with formula and formatting preservation.
