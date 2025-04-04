@@ -1,0 +1,36 @@
+# General configuration
+excel_files:
+  - "Deposits Data Lite.xlsx"
+  - "Form X Report  Main Lite.xlsx"
+  - "Loans Data Lite.xlsx"
+report_sheets:
+  - "Part I"
+  - "Part II" 
+  - "Part III"
+  - "MIS-Report"
+exclude_sheets:
+  - "Pivot-Borrowings"
+db_filename: "excel_data.db"
+output_dir: "output"
+new_base_path: "C:\\ProcessedFiles\\"
+log_level: "INFO"
+
+# Phase-specific configurations
+phase1:
+  enabled: true
+  save_identification_json: true
+  identification_file: "workbook_identification.json"
+  
+phase2:
+  enabled: true
+  recreate_db: true
+  store_tabular_data: true
+  
+phase3:
+  enabled: true
+  include_links_sheet: true
+  fix_external_references: true
+  
+phase4:
+  enabled: true
+  target_font_color: "FF000000"
