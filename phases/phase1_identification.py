@@ -5,7 +5,7 @@ Identifies and extracts data from Excel files.
 
 import os
 import json
-from datetime import datetime
+from datetime import datetime,date
 from typing import Dict, Any, Optional, List, Set, Tuple
 
 import openpyxl
